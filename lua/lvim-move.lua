@@ -1,8 +1,6 @@
 local config = require("lvim-move.config")
 local utils = require("lvim-move.utils")
-local map = require("lvim-move.key-maps").map
--- local autocmd = require("lvim-move.autocmd")
--- local switch = require("lvim-move.switch")
+local maps = require("lvim-move.key-maps")
 
 local M = {}
 
@@ -14,14 +12,22 @@ M.setup = function(user_config)
 end
 
 local function map_defaults()
-    map(
+    maps.map(
         {
-            {"v", "<A-l>", "<Plug>LvimCharacterRight", {}}
+            {"n", "<A-j>", "LvimMoveDownN", {}},
+            {"n", "<A-k>", "LvimMoveUpN", {}},
+            {"n", "<A-h>", "LvimMoveLeftN", {}},
+            {"n", "<A-l>", "LvimMoveRightN", {}},
+            {"x", "<A-j>", "LvimMoveDownV", {}},
+            {"x", "<A-k>", "LvimMoveUpV", {}},
+            {"x", "<A-h>", "LvimMoveLeftV", {}},
+            {"x", "<A-l>", "LvimMoveRightV", {}}
         }
     )
 end
 
 M.init = function()
+    maps.set_maps()
     if config.default_keybindings == 1 then
         map_defaults()
     end

@@ -1,52 +1,65 @@
+local utils = require("lvim-move.utils")
+local lines = require("lvim-move.move.lines")
+
 local M = {}
 -- v       Visual by character
---     V       Visual by line
---     CTRL-V  Visual blockwise
+-- V       Visual by line
+-- CTRL-V  Visual blockwise
 
--- LINES
-M.line_up = function()
-    print("line up")
+M.LvimMoveDownN = function()
+    utils.cursor_position()
+    lines.down("n")
 end
 
-M.line_down = function()
-    print("line down")
-end
--- LINES
-
--- CHARACTERS
-M.character_up = function()
-    print("character up")
+M.LvimMoveUpN = function()
+    utils.cursor_position()
+    lines.up("n")
 end
 
-M.character_down = function()
-    print("character down")
+M.LvimMoveLeftN = function()
+    utils.cursor_position()
+    lines.left("n")
 end
 
-M.character_left = function()
-    print("character left")
+M.LvimMoveRightN = function()
+    utils.cursor_position()
+    lines.right("n")
 end
 
-function M.character_right()
-    print("helllooooo")
-end
--- CHARACTERS
-
--- BLOCK
-M.block_up = function()
-    print("block up")
-end
-
-M.block_down = function()
-    print("block down")
+M.LvimMoveDownV = function()
+    vim.cmd("normal! gv")
+    utils.cursor_position()
+    local mode = vim.fn.visualmode()
+    if mode == "V" then
+        lines.down(mode)
+    end
 end
 
-M.block_left = function()
-    print("block left")
+M.LvimMoveUpV = function()
+    vim.cmd("normal! gv")
+    utils.cursor_position()
+    local mode = vim.fn.visualmode()
+    if mode == "V" then
+        lines.up(mode)
+    end
 end
 
-M.block_right = function()
-    print("block right")
+M.LvimMoveLeftV = function()
+    vim.cmd("normal! gv")
+    utils.cursor_position()
+    local mode = vim.fn.visualmode()
+    if mode == "V" then
+        lines.left(mode)
+    end
 end
--- BLOCK
+
+M.LvimMoveRightV = function()
+    vim.cmd("normal! gv")
+    utils.cursor_position()
+    local mode = vim.fn.visualmode()
+    if mode == "V" then
+        lines.right(mode)
+    end
+end
 
 return M

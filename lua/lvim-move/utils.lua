@@ -1,3 +1,4 @@
+local config = require("lvim-move.config")
 local cmd = vim.api.nvim_command
 
 local M = {}
@@ -35,24 +36,13 @@ M.is_array = function(t)
     return true
 end
 
--- M.create_augroups = function(definitions)
---     for group_name, definition in pairs(definitions) do
---         cmd("augroup " .. group_name)
---         cmd("autocmd!")
---         for _, def in ipairs(definition) do
---             local command = table.concat(vim.tbl_flatten({"autocmd", def}), " ")
---             cmd(command)
---         end
---         cmd("augroup END")
---     end
--- end
---
--- M.map = function(mode, lhs, rhs, opts)
---     local options = {noremap = true}
---     if opts then
---         options = vim.tbl_extend("force", options, opts)
---     end
---     vim.api.nvim_set_keymap(mode, lhs, rhs, options)
--- end_row
+M.cursor_position = function()
+    local line, column = unpack(vim.api.nvim_win_get_cursor(0))
+    print(line, column)
+    config.cursor_position = {
+        line = line,
+        column = column
+    }
+end
 
 return M
