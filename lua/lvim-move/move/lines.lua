@@ -6,7 +6,11 @@ M.down = function(mode)
     if mode == "n" then
         local last_line = tonumber(vim.api.nvim_exec([[echo line('$')]], true))
         local current_line = vim.fn.getpos(".")[2]
-        if last_line > current_line then
+        -- local is_folded_next = tonumber(vim.api.nvim_exec([[echo foldclosed(]] .. current_line .. [[)]], true))
+        local is_folded_current = tonumber(vim.api.nvim_exec([[echo foldclosed(]] .. current_line .. [[)]], true))
+        if is_folded_current > -1 then
+            vim.cmd("normal! zv")
+        elseif last_line > current_line then
             vim.cmd("normal! ddp")
             vim.api.nvim_win_set_cursor({0}, {config.cursor_position.line + 1, config.cursor_position.column})
         end
@@ -16,7 +20,10 @@ M.down = function(mode)
         local start_line = vim.fn.getpos("'<")[2]
         local end_line = vim.fn.getpos("'>")[2]
         local lines_number = (end_line - start_line) + 1
-        if last_line > end_line then
+        local is_folded_current = tonumber(vim.api.nvim_exec([[echo foldclosed(]] .. current_line .. [[)]], true))
+        if is_folded_current > -1 then
+            vim.cmd("normal! zv")
+        elseif last_line > end_line then
             if lines_number > 1 then
                 if current_line == start_line then
                     vim.cmd(
@@ -41,7 +48,10 @@ M.up = function(mode)
     if mode == "n" then
         local last_line = tonumber(vim.api.nvim_exec([[echo line('$')]], true))
         local current_line = vim.fn.getpos(".")[2]
-        if current_line == last_line then
+        local is_folded_current = tonumber(vim.api.nvim_exec([[echo foldclosed(]] .. current_line .. [[)]], true))
+        if is_folded_current > -1 then
+            vim.cmd("normal! zv")
+        elseif current_line == last_line then
             vim.cmd("normal! ddP")
             vim.api.nvim_win_set_cursor({0}, {config.cursor_position.line - 1, config.cursor_position.column})
         elseif current_line > 1 then
@@ -54,7 +64,10 @@ M.up = function(mode)
         local start_line = vim.fn.getpos("'<")[2]
         local end_line = vim.fn.getpos("'>")[2]
         local lines_number = (end_line - start_line) + 1
-        if start_line > 1 then
+        local is_folded_current = tonumber(vim.api.nvim_exec([[echo foldclosed(]] .. current_line .. [[)]], true))
+        if is_folded_current > -1 then
+            vim.cmd("normal! zv")
+        elseif start_line > 1 then
             if end_line == last_line then
                 if lines_number > 1 then
                     if current_line == start_line then
@@ -99,29 +112,39 @@ M.left = function(mode)
     local tabstop = tonumber(vim.api.nvim_exec([[echo &tabstop]], true))
     if mode == "n" then
         local current_line = vim.fn.getpos(".")[2]
-        vim.cmd("normal! V" .. current_line)
-        vim.cmd("normal! gv<")
-        local cursor_position = config.cursor_position.column - tabstop
-        if cursor_position < 1 then
-            cursor_position = 1
+        local is_folded_current = tonumber(vim.api.nvim_exec([[echo foldclosed(]] .. current_line .. [[)]], true))
+        if is_folded_current > -1 then
+            vim.cmd("normal! zv")
+        else
+            vim.cmd("normal! V" .. current_line)
+            vim.cmd("normal! gv<")
+            local cursor_position = config.cursor_position.column - tabstop
+            if cursor_position < 1 then
+                cursor_position = 1
+            end
+            vim.api.nvim_win_set_cursor({0}, {current_line, cursor_position})
         end
-        vim.api.nvim_win_set_cursor({0}, {current_line, cursor_position})
     elseif mode == "V" then
         local start_line = vim.fn.getpos("'<")[2]
         local end_line = vim.fn.getpos("'>")[2]
         local lines_number = (end_line - start_line) + 1
         local current_line = vim.fn.getpos(".")[2]
-        vim.cmd("normal! gv<")
-        if lines_number > 1 then
-            vim.cmd("normal! V" .. (lines_number - 1) .. "j")
+        local is_folded_current = tonumber(vim.api.nvim_exec([[echo foldclosed(]] .. current_line .. [[)]], true))
+        if is_folded_current > -1 then
+            vim.cmd("normal! zv")
         else
-            vim.cmd("normal! V" .. (lines_number - 1))
+            vim.cmd("normal! gv<")
+            if lines_number > 1 then
+                vim.cmd("normal! V" .. (lines_number - 1) .. "j")
+            else
+                vim.cmd("normal! V" .. (lines_number - 1))
+            end
+            local cursor_position = config.cursor_position.column - tabstop
+            if cursor_position < 1 then
+                cursor_position = 1
+            end
+            vim.api.nvim_win_set_cursor({0}, {current_line, cursor_position})
         end
-        local cursor_position = config.cursor_position.column - tabstop
-        if cursor_position < 1 then
-            cursor_position = 1
-        end
-        vim.api.nvim_win_set_cursor({0}, {current_line, cursor_position})
     end
 end
 
@@ -129,21 +152,30 @@ M.right = function(mode)
     local tabstop = tonumber(vim.api.nvim_exec([[echo &tabstop]], true))
     if mode == "n" then
         local current_line = vim.fn.getpos(".")[2]
-        vim.cmd("normal! V" .. current_line)
-        vim.cmd("normal! gv>")
-        vim.api.nvim_win_set_cursor({0}, {current_line, config.cursor_position.column + tabstop})
+        local is_folded_current = tonumber(vim.api.nvim_exec([[echo foldclosed(]] .. current_line .. [[)]], true))
+        if is_folded_current > -1 then
+            vim.cmd("normal! zv")
+        else
+            vim.cmd("normal! V" .. current_line)
+            vim.cmd("normal! gv>")
+            vim.api.nvim_win_set_cursor({0}, {current_line, config.cursor_position.column + tabstop})
+        end
     elseif mode == "V" then
         local start_line = vim.fn.getpos("'<")[2]
         local end_line = vim.fn.getpos("'>")[2]
         local lines_number = (end_line - start_line) + 1
         local current_line = vim.fn.getpos(".")[2]
-        vim.cmd("normal! gv>")
-        if lines_number > 1 then
-            vim.cmd("normal! V" .. (lines_number - 1) .. "j")
+        if is_folded_current > -1 then
+            vim.cmd("normal! zv")
         else
-            vim.cmd("normal! V" .. (lines_number - 1))
+            vim.cmd("normal! gv>")
+            if lines_number > 1 then
+                vim.cmd("normal! V" .. (lines_number - 1) .. "j")
+            else
+                vim.cmd("normal! V" .. (lines_number - 1))
+            end
+            vim.api.nvim_win_set_cursor({0}, {current_line, config.cursor_position.column + tabstop})
         end
-        vim.api.nvim_win_set_cursor({0}, {current_line, config.cursor_position.column + tabstop})
     end
 end
 
