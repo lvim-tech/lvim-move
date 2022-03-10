@@ -1,7 +1,7 @@
 local M = {}
 
 M.map = function(allkeys)
-    for index, value in ipairs(allkeys) do
+    for _, value in ipairs(allkeys) do
         if type(value) == "table" then
             if #value == 4 then
                 vim.api.nvim_set_keymap(value[1], value[2], value[3], value[4])

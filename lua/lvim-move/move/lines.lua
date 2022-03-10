@@ -15,12 +15,22 @@ M.down = function(mode)
         local last_line = tonumber(vim.api.nvim_exec([[echo line('$')]], true))
         local start_line = vim.fn.getpos("'<")[2]
         local end_line = vim.fn.getpos("'>")[2]
-        local lines_numbers = (end_line - start_line) + 1
+        local lines_number = (end_line - start_line) + 1
         if last_line > end_line then
-            if current_line == start_line then
-                vim.cmd("normal! " .. lines_numbers .. "dp" .. (lines_numbers - 1) .. "j" .. (lines_numbers - 1) .. "V")
-            elseif current_line == end_line then
-                vim.cmd("normal! " .. lines_numbers .. "dpV" .. (lines_numbers - 1) .. "j")
+            if lines_number > 1 then
+                if current_line == start_line then
+                    vim.cmd(
+                        "normal! " .. lines_number .. "dp" .. (lines_number - 1) .. "j" .. (lines_number - 1) .. "V"
+                    )
+                elseif current_line == end_line then
+                    vim.cmd("normal! " .. lines_number .. "dpV" .. (lines_number - 1) .. "j")
+                end
+            else
+                if current_line == start_line then
+                    vim.cmd("normal! " .. lines_number .. "dpV")
+                elseif current_line == end_line then
+                    vim.cmd("normal! " .. lines_number .. "dpV")
+                end
             end
             vim.api.nvim_win_set_cursor({0}, {config.cursor_position.line + 1, config.cursor_position.column})
         end
@@ -43,24 +53,41 @@ M.up = function(mode)
         local last_line = tonumber(vim.api.nvim_exec([[echo line('$')]], true))
         local start_line = vim.fn.getpos("'<")[2]
         local end_line = vim.fn.getpos("'>")[2]
-        local lines_numbers = (end_line - start_line) + 1
+        local lines_number = (end_line - start_line) + 1
         if start_line > 1 then
             if end_line == last_line then
-                if current_line == start_line then
-                    vim.cmd(
-                        "normal! " .. lines_numbers .. "dP" .. (lines_numbers - 1) .. "j" .. (lines_numbers - 1) .. "V"
-                    )
-                elseif current_line == end_line then
-                    vim.cmd("normal! " .. lines_numbers .. "dPV" .. (lines_numbers - 1) .. "j")
+                if lines_number > 1 then
+                    if current_line == start_line then
+                        vim.cmd(
+                            "normal! " .. lines_number .. "dP" .. (lines_number - 1) .. "j" .. (lines_number - 1) .. "V"
+                        )
+                    elseif current_line == end_line then
+                        vim.cmd("normal! " .. lines_number .. "dPV" .. (lines_number - 1) .. "j")
+                    end
+                else
+                    if current_line == start_line then
+                        vim.cmd("normal! " .. lines_number .. "dPV")
+                    elseif current_line == end_line then
+                        vim.cmd("normal! " .. lines_number .. "dPV")
+                    end
                 end
                 vim.api.nvim_win_set_cursor({0}, {config.cursor_position.line - 1, config.cursor_position.column})
             else
-                if current_line == start_line then
-                    vim.cmd(
-                        "normal! " .. lines_numbers .. "dkP" .. (lines_numbers - 1) .. "j" .. (lines_numbers - 1) .. "V"
-                    )
-                elseif current_line == end_line then
-                    vim.cmd("normal! " .. lines_numbers .. "dkPV" .. (lines_numbers - 1) .. "j")
+                if lines_number > 1 then
+                    if current_line == start_line then
+                        vim.cmd(
+                            "normal! " ..
+                                lines_number .. "dkP" .. (lines_number - 1) .. "j" .. (lines_number - 1) .. "V"
+                        )
+                    elseif current_line == end_line then
+                        vim.cmd("normal! " .. lines_number .. "dkPV" .. (lines_number - 1) .. "j")
+                    end
+                else
+                    if current_line == start_line then
+                        vim.cmd("normal! " .. lines_number .. "dkPV")
+                    elseif current_line == end_line then
+                        vim.cmd("normal! " .. lines_number .. "dkPV")
+                    end
                 end
                 vim.api.nvim_win_set_cursor({0}, {config.cursor_position.line - 1, config.cursor_position.column})
             end
