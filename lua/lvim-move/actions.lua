@@ -7,58 +7,74 @@ local M = {}
 -- CTRL-V  Visual blockwise
 
 M.LvimMoveDownN = function()
-    utils.cursor_position()
-    lines.down("n")
+    if vim.o.modifiable then
+        utils.cursor_position()
+        lines.down("n")
+    end
 end
 
 M.LvimMoveUpN = function()
-    utils.cursor_position()
-    lines.up("n")
+    if vim.o.modifiable then
+        utils.cursor_position()
+        lines.up("n")
+    end
 end
 
 M.LvimMoveLeftN = function()
-    utils.cursor_position()
-    lines.left("n")
+    if vim.o.modifiable then
+        utils.cursor_position()
+        lines.left("n")
+    end
 end
 
 M.LvimMoveRightN = function()
-    utils.cursor_position()
-    lines.right("n")
+    if vim.o.modifiable then
+        utils.cursor_position()
+        lines.right("n")
+    end
 end
 
 M.LvimMoveDownV = function()
-    vim.cmd("normal! gv")
-    utils.cursor_position()
-    local mode = vim.fn.visualmode()
-    if mode == "V" then
-        lines.down(mode)
+    if vim.o.modifiable then
+        vim.cmd("normal! gv")
+        utils.cursor_position()
+        local mode = vim.fn.visualmode()
+        if mode == "V" then
+            lines.down(mode)
+        end
     end
 end
 
 M.LvimMoveUpV = function()
-    vim.cmd("normal! gv")
-    utils.cursor_position()
-    local mode = vim.fn.visualmode()
-    if mode == "V" then
-        lines.up(mode)
+    if vim.o.modifiable then
+        vim.cmd("normal! gv")
+        utils.cursor_position()
+        local mode = vim.fn.visualmode()
+        if mode == "V" then
+            lines.up(mode)
+        end
     end
 end
 
 M.LvimMoveLeftV = function()
-    vim.cmd("normal! gv")
-    utils.cursor_position()
-    local mode = vim.fn.visualmode()
-    if mode == "V" then
-        lines.left(mode)
+    if vim.o.modifiable then
+        vim.cmd("normal! gv")
+        utils.cursor_position()
+        local mode = vim.fn.visualmode()
+        if mode == "V" then
+            lines.left(mode)
+        end
     end
 end
 
 M.LvimMoveRightV = function()
-    vim.cmd("normal! gv")
-    utils.cursor_position()
-    local mode = vim.fn.visualmode()
-    if mode == "V" then
-        lines.right(mode)
+    if vim.o.modifiable then
+        vim.cmd("normal! gv")
+        utils.cursor_position()
+        local mode = vim.fn.visualmode()
+        if mode == "V" then
+            lines.right(mode)
+        end
     end
 end
 
