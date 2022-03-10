@@ -101,7 +101,11 @@ M.left = function(mode)
         local current_line = vim.fn.getpos(".")[2]
         vim.cmd("normal! V" .. current_line)
         vim.cmd("normal! gv<")
-        vim.api.nvim_win_set_cursor({0}, {current_line, config.cursor_position.column - tabstop})
+        local cursor_position = config.cursor_position.column - tabstop
+        if cursor_position < 1 then
+            cursor_position = 1
+        end
+        vim.api.nvim_win_set_cursor({0}, {current_line, cursor_position})
     elseif mode == "V" then
         local start_line = vim.fn.getpos("'<")[2]
         local end_line = vim.fn.getpos("'>")[2]
@@ -113,7 +117,11 @@ M.left = function(mode)
         else
             vim.cmd("normal! V" .. (lines_number - 1))
         end
-        vim.api.nvim_win_set_cursor({0}, {current_line, config.cursor_position.column - tabstop})
+        local cursor_position = config.cursor_position.column - tabstop
+        if cursor_position < 1 then
+            cursor_position = 1
+        end
+        vim.api.nvim_win_set_cursor({0}, {current_line, cursor_position})
     end
 end
 
