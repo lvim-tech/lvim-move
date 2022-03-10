@@ -38,7 +38,6 @@ end
 
 M.cursor_position = function()
     local line, column = unpack(vim.api.nvim_win_get_cursor(0))
-    print(line, column)
     config.cursor_position = {
         line = line,
         column = column
