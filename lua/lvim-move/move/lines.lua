@@ -165,6 +165,7 @@ M.right = function(mode)
         local end_line = vim.fn.getpos("'>")[2]
         local lines_number = (end_line - start_line) + 1
         local current_line = vim.fn.getpos(".")[2]
+        local is_folded_current = tonumber(vim.api.nvim_exec([[echo foldclosed(]] .. current_line .. [[)]], true))
         if is_folded_current > -1 then
             vim.cmd("normal! zv")
         else
