@@ -93,11 +93,11 @@ M.up = function(mode)
                                 lines_number .. "dkP" .. (lines_number - 1) .. "j" .. (lines_number - 1) .. "V"
                         )
                     elseif current_line == end_line then
-                        vim.cmd("normal! " .. lines_number .. "dkPV" .. (lines_number - 1) .. "j")
+                        vim.cmd("normal! " .. lines_number .. "dkPV" .. (lines_number - 1) .. "k")
                     end
                 else
                     if current_line == start_line then
-                        vim.cmd("normal! " .. lines_number .. "dkPV")
+                        vim.cmd("normal! " .. lines_number .. "djPV")
                     elseif current_line == end_line then
                         vim.cmd("normal! " .. lines_number .. "dkPV")
                     end
@@ -135,7 +135,11 @@ M.left = function(mode)
         else
             vim.cmd("normal! gv<")
             if lines_number > 1 then
-                vim.cmd("normal! V" .. (lines_number - 1) .. "j")
+                if current_line == start_line then
+                    vim.cmd("normal! " .. (lines_number -1) .. "jV" .. (lines_number -1) .. "k")
+                elseif current_line == end_line then
+                    vim.cmd("normal! V" .. (lines_number -1) .. "j")
+                end
             else
                 vim.cmd("normal! V" .. (lines_number - 1))
             end
@@ -171,7 +175,11 @@ M.right = function(mode)
         else
             vim.cmd("normal! gv>")
             if lines_number > 1 then
-                vim.cmd("normal! V" .. (lines_number - 1) .. "j")
+                if current_line == start_line then
+                    vim.cmd("normal! " .. (lines_number -1) .. "jV" .. (lines_number -1) .. "k")
+                elseif current_line == end_line then
+                    vim.cmd("normal! V" .. (lines_number -1) .. "j")
+                end
             else
                 vim.cmd("normal! V" .. (lines_number - 1))
             end
