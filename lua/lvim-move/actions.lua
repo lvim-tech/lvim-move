@@ -1,5 +1,6 @@
 local utils = require("lvim-move.utils")
 local lines = require("lvim-move.move.lines")
+local characters = require("lvim-move.move.characters")
 
 local M = {}
 -- v       Visual by character
@@ -41,6 +42,8 @@ M.LvimMoveDownV = function()
         local mode = vim.fn.visualmode()
         if mode == "V" then
             lines.down(mode)
+        elseif mode == "v" then
+            characters.down()
         end
     end
 end
@@ -52,6 +55,8 @@ M.LvimMoveUpV = function()
         local mode = vim.fn.visualmode()
         if mode == "V" then
             lines.up(mode)
+        elseif mode == "v" then
+            characters.up()
         end
     end
 end
@@ -63,6 +68,8 @@ M.LvimMoveLeftV = function()
         local mode = vim.fn.visualmode()
         if mode == "V" then
             lines.left(mode)
+        elseif mode == "v" then
+            characters.left()
         end
     end
 end
@@ -74,6 +81,8 @@ M.LvimMoveRightV = function()
         local mode = vim.fn.visualmode()
         if mode == "V" then
             lines.right(mode)
+        elseif mode == "v" then
+            characters.right()
         end
     end
 end

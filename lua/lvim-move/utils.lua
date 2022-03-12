@@ -37,10 +37,10 @@ M.is_array = function(t)
 end
 
 M.cursor_position = function()
-    local line, column = unpack(vim.api.nvim_win_get_cursor(0))
+    local position = vim.api.nvim_win_get_cursor(0)
     config.cursor_position = {
-        line = line,
-        column = column
+        line = position[1],
+        column = position[2]
     }
 end
 
