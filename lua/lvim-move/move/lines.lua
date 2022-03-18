@@ -39,7 +39,6 @@ M.down = function(mode)
                     vim.cmd("normal! " .. lines_number .. "dpV")
                 end
             end
-            -- print(config.cursor_position.line, config.cursor_position.column)
             vim.api.nvim_win_set_cursor(0, {config.cursor_position.line + 1, config.cursor_position.column})
         end
     end

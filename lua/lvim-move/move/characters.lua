@@ -28,7 +28,6 @@ M.down = function()
                 end
             else
                 if all_characters > start_character + 1 then
-                    print(1)
                     if start_character == 1 then
                         vim.cmd("normal! P" .. (characters_number - 1) .. "hv" .. (characters_number - 1) .. "l")
                     else
@@ -131,23 +130,5 @@ M.right = function()
         end
     end
 end
-
--- print(vim.inspect(start_line),vim.inspect(end_line))
--- print(vim.fn.col("$"))
--- M.is_V = function()
---     local start_characters = vim.fn.getpos("'<")
---     local end_characters = vim.fn.getpos("'>")
---     local start_line = start_characters[2]
---     local end_line = end_characters[2]
---     local start_cursor = start_characters[3]
---     local end_cursor = end_characters[3]
---     local lines_number = (end_line - start_line) + 1
---     if lines_number > 1 then
---         vim.cmd("normal! V")
---         lines.right("V")
---     else
-
---     end
--- end
 
 return M
