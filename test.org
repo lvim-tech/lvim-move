@@ -42,7 +42,7 @@
 ***** [[https://github.com/nvim-lua/plenary.nvim][plenary.nvim]] 
  
       - Descriptions
-        -- This is description
+        This is description
  
       - Init
         #+begin_src lua
@@ -54,11 +54,9 @@
 ***** [[https://github.com/nvim-lua/popup.nvim][popup.nvim]]
  
       - Descriptions
-        -- This is description 
+        This is description 
  
       - Init
         #+begin_src lua
         modules["nvim-lua/popup.nvim"] = {}
         #+end_src
- 
-        Here we refer to item [[target]].
