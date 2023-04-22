@@ -95,7 +95,6 @@ M.up = function(mode)
 						vim.cmd("silent! normal! " .. lines_number .. "dPV")
 					end
 				end
-				vim.api.nvim_win_set_cursor(0, { config.cursor_position.line - 1, config.cursor_position.column })
 			else
 				if lines_number > 1 then
 					if current_line == start_line then
@@ -114,8 +113,8 @@ M.up = function(mode)
 				else
 					vim.cmd("silent! normal! " .. lines_number .. "dkPV")
 				end
-				vim.api.nvim_win_set_cursor(0, { config.cursor_position.line - 1, config.cursor_position.column })
 			end
+			vim.api.nvim_win_set_cursor(0, { config.cursor_position.line - 1, config.cursor_position.column })
 		end
 	end
 end

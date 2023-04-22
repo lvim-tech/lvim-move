@@ -48,15 +48,15 @@ M.LvimMoveDownV = function()
 		vim.cmd("silent! normal! gv")
 		utils.cursor_position()
 		local mode = vim.api.nvim_get_mode()["mode"]
-		vim.notify(mode)
 		if mode == "V" then
 			lines.down(mode)
-			if config.maps then
-				vim.cmd("silent! normal! ==")
+			if config.indent then
+				vim.cmd("normal! ==")
+				vim.cmd("normal! gv")
 			end
 		elseif mode == "v" then
 			characters.down()
-		elseif mode == "CTRL-V" then
+		elseif mode == "^V" then
 		end
 	end
 end
@@ -68,11 +68,13 @@ M.LvimMoveUpV = function()
 		local mode = vim.api.nvim_get_mode()["mode"]
 		if mode == "V" then
 			lines.up(mode)
-			if config.maps then
-				vim.cmd("silent! normal! ==")
+			if config.indent then
+				vim.cmd("normal! ==")
+				vim.cmd("normal! gv")
 			end
 		elseif mode == "v" then
 			characters.up()
+		elseif mode == "^V" then
 		end
 	end
 end
@@ -86,6 +88,7 @@ M.LvimMoveLeftV = function()
 			lines.left(mode)
 		elseif mode == "v" then
 			characters.left()
+		elseif mode == "^V" then
 		end
 	end
 end
@@ -99,6 +102,7 @@ M.LvimMoveRightV = function()
 			lines.right(mode)
 		elseif mode == "v" then
 			characters.right()
+		elseif mode == "^V" then
 		end
 	end
 end

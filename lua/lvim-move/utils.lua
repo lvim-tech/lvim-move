@@ -44,26 +44,4 @@ M.cursor_position = function()
 	}
 end
 
-M.reindent = function()
-	vim.defer_fn(function()
-		local new_line_start = vim.fn.line("'[")
-		local new_line_end = vim.fn.line("']")
-		vim.fn.cursor(new_line_start, 1)
-		local old_indent = vim.fn.indent(".")
-		vim.cmd("silent! normal! ==")
-		local new_indent = vim.fn.indent(".")
-
-		if new_line_start < new_line_end and old_indent ~= new_indent then
-			local op = (
-				old_indent < new_indent and string.rep(">", new_indent - old_indent)
-				or string.rep("<", old_indent - new_indent)
-			)
-			local old_sw = vim.fn.shiftwidth()
-			vim.o.shiftwidth = 1
-			vim.cmd("silent! " .. new_line_start + 1 .. "," .. new_line_end .. op)
-			vim.o.shiftwidth = old_sw
-		end
-	end, 100)
-end
-
 return M
