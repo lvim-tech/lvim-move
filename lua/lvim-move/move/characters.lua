@@ -1,179 +1,58 @@
-local config = require("lvim-move.config")
-local lines = require("lvim-move.move.lines")
-
 local M = {}
 
 M.down = function()
-	local start_characters = vim.fn.getcharpos("'<")
-	local end_characters = vim.fn.getcharpos("'>")
-	local start_line = start_characters[2]
-	local end_line = end_characters[2]
-	local start_character = start_characters[3]
-	local end_character = end_characters[3]
-	local characters_number = (end_character - start_character) + 1
-	local lines_number = (end_line - start_line) + 1
-	local last_line = tonumber(vim.api.nvim_exec([[echo line('$')]], true))
-	if lines_number > 1 then
-		vim.cmd("silent! normal! V")
-		lines.down("V")
-	else
-		if last_line > start_line then
-			vim.cmd("silent! normal! dj0")
-			local all_characters = vim.fn.col("$")
-			if
-				math.abs(config.cursor_position.column - (config.cursor_position.column + end_character))
-					- config.cursor_position.column
-				== characters_number
-			then
-				if all_characters > config.cursor_position.column + 1 then
-					vim.cmd(
-						"silent! normal! "
-							.. (config.cursor_position.column - 1)
-							.. "lPv"
-							.. (characters_number - 1)
-							.. "h"
-					)
-				else
-					vim.cmd("silent! normal! $Pv" .. (characters_number - 1) .. "h")
-				end
-			else
-				if all_characters > start_character + 1 then
-					if start_character == 1 then
-						vim.cmd(
-							"silent! normal! P" .. (characters_number - 1) .. "hv" .. (characters_number - 1) .. "l"
-						)
-					else
-						vim.cmd(
-							"silent! normal! "
-								.. (start_character - 1)
-								.. "lP"
-								.. (characters_number - 1)
-								.. "hv"
-								.. (characters_number - 1)
-								.. "l"
-						)
-					end
-				else
-					vim.cmd("silent! normal! p" .. (characters_number - 1) .. "hv" .. (characters_number - 1) .. "l")
-				end
-			end
-		end
+	local start_character = vim.fn.getcharpos("'<")[3]
+	local end_character = vim.fn.getcharpos("'>")[3]
+	local cursor_position = vim.fn.getcharpos(".")[3]
+	local all_characters = (end_character - start_character) + 1
+	if all_characters == 1 then
+		vim.cmd("silent! normal! djPv")
+	elseif cursor_position == start_character then
+		vim.cmd("silent! normal! djPv" .. (all_characters - 1) .. "h")
+	elseif cursor_position == end_character then
+		vim.cmd("silent! normal! djP" .. (all_characters - 1) .. "hv" .. (all_characters - 1) .. "l")
 	end
 end
 
 M.up = function()
-	local start_characters = vim.fn.getcharpos("'<")
-	local end_characters = vim.fn.getcharpos("'>")
-	local start_line = start_characters[2]
-	local end_line = end_characters[2]
-	local start_character = start_characters[3]
-	local end_character = end_characters[3]
-	local characters_number = (end_character - start_character) + 1
-	local lines_number = (end_line - start_line) + 1
-	if lines_number > 1 then
-		vim.cmd("silent! normal! V")
-		lines.up("V")
-	else
-		if start_line > 1 then
-			vim.cmd("silent! normal! dk0")
-			local all_characters = vim.fn.col("$")
-			if
-				math.abs(config.cursor_position.column - (config.cursor_position.column + end_character))
-					- config.cursor_position.column
-				== characters_number
-			then
-				if all_characters > config.cursor_position.column + 1 then
-					vim.cmd(
-						"silent! normal! "
-							.. (config.cursor_position.column - 1)
-							.. "lPv"
-							.. (characters_number - 1)
-							.. "h"
-					)
-				else
-					vim.cmd("silent! normal! $Pv" .. (characters_number - 1) .. "h")
-				end
-			else
-				if all_characters > start_character + 1 then
-					if start_character == 1 then
-						vim.cmd(
-							"silent! normal! P" .. (characters_number - 1) .. "hv" .. (characters_number - 1) .. "l"
-						)
-					else
-						vim.cmd(
-							"silent! normal! "
-								.. (start_character - 1)
-								.. "lP"
-								.. (characters_number - 1)
-								.. "hv"
-								.. (characters_number - 1)
-								.. "l"
-						)
-					end
-				else
-					vim.cmd("silent! normal! p" .. (characters_number - 1) .. "hv" .. (characters_number - 1) .. "l")
-				end
-			end
-		end
+	local start_character = vim.fn.getcharpos("'<")[3]
+	local end_character = vim.fn.getcharpos("'>")[3]
+	local cursor_position = vim.fn.getcharpos(".")[3]
+	local all_characters = (end_character - start_character) + 1
+	if all_characters == 1 then
+		vim.cmd("silent! normal! dkPv")
+	elseif cursor_position == start_character then
+		vim.cmd("silent! normal! dkPv" .. (all_characters - 1) .. "h")
+	elseif cursor_position == end_character then
+		vim.cmd("silent! normal! dkP" .. (all_characters - 1) .. "hv" .. (all_characters - 1) .. "l")
 	end
 end
 
 M.left = function()
-	local start_characters = vim.fn.getcharpos("'<")
-	local end_characters = vim.fn.getcharpos("'>")
-	local start_line = start_characters[2]
-	local end_line = end_characters[2]
-	local start_character = start_characters[3]
-	local end_character = end_characters[3]
-	local characters_number = (end_character - start_character) + 1
-	local lines_number = (end_line - start_line) + 1
-	if lines_number > 1 then
-		vim.cmd("silent! normal! V")
-		lines.left("V")
-	else
-		if start_character > 1 then
-			if characters_number == 1 then
-				vim.cmd("silent! normal! dhPv")
-			elseif
-				math.abs(config.cursor_position.column - (config.cursor_position.column + end_character))
-					- config.cursor_position.column
-				== characters_number
-			then
-				vim.cmd("silent! normal! dhPv" .. (characters_number - 1) .. "h")
-			else
-				vim.cmd("silent! normal! dhP" .. (characters_number - 1) .. "hv" .. (characters_number - 1) .. "l")
-			end
-		end
+	local start_character = vim.fn.getcharpos("'<")[3]
+	local end_character = vim.fn.getcharpos("'>")[3]
+	local cursor_position = vim.fn.getcharpos(".")[3]
+	local all_characters = (end_character - start_character) + 1
+	if all_characters == 1 then
+		vim.cmd("silent! normal! dhPv")
+	elseif cursor_position == start_character then
+		vim.cmd("silent! normal! dhPv" .. (all_characters - 1) .. "h")
+	elseif cursor_position == end_character then
+		vim.cmd("silent! normal! dhP" .. (all_characters - 1) .. "hv" .. (all_characters - 1) .. "l")
 	end
 end
 
 M.right = function()
-	local start_characters = vim.fn.getcharpos("'<")
-	local end_characters = vim.fn.getcharpos("'>")
-	local start_line = start_characters[2]
-	local end_line = end_characters[2]
-	local start_character = start_characters[3]
-	local end_character = end_characters[3]
-	local characters_number = (end_character - start_character) + 1
-	local lines_number = (end_line - start_line) + 1
-	if lines_number > 1 then
-		vim.cmd("silent! normal! V")
-		lines.right("V")
-	else
-		local all_characters = vim.fn.col("$")
-		if all_characters > end_character then
-			if characters_number == 1 then
-				vim.cmd("silent! normal! dpv")
-			elseif
-				math.abs(config.cursor_position.column - (config.cursor_position.column + end_character))
-					- config.cursor_position.column
-				== characters_number
-			then
-				vim.cmd("silent! normal! dpv" .. (characters_number - 1) .. "h")
-			else
-				vim.cmd("silent! normal! dp" .. (characters_number - 1) .. "hv" .. (characters_number - 1) .. "l")
-			end
-		end
+	local start_character = vim.fn.getcharpos("'<")[3]
+	local end_character = vim.fn.getcharpos("'>")[3]
+	local cursor_position = vim.fn.getcharpos(".")[3]
+	local all_characters = (end_character - start_character) + 1
+	if all_characters == 1 then
+		vim.cmd("silent! normal! dpv")
+	elseif cursor_position == start_character then
+		vim.cmd("silent! normal! dpv" .. (all_characters - 1) .. "h")
+	elseif cursor_position == end_character then
+		vim.cmd("silent! normal! dp" .. (all_characters - 1) .. "hv" .. (all_characters - 1) .. "l")
 	end
 end
 

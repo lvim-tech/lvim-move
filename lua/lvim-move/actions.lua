@@ -12,8 +12,8 @@ M.LvimMoveDownN = function()
 	if vim.o.modifiable then
 		utils.cursor_position()
 		lines.down("n")
-		if config.maps then
-			vim.cmd("silent! normal! ==")
+		if config.indent then
+			vim.cmd("normal! ==")
 		end
 	end
 end
@@ -22,8 +22,8 @@ M.LvimMoveUpN = function()
 	if vim.o.modifiable then
 		utils.cursor_position()
 		lines.up("n")
-		if config.maps then
-			vim.cmd("silent! normal! ==")
+		if config.indent then
+			vim.cmd("normal! ==")
 		end
 	end
 end
@@ -37,7 +37,6 @@ end
 
 M.LvimMoveRightN = function()
 	if vim.o.modifiable then
-		vim.notify("Right")
 		utils.cursor_position()
 		lines.right("n")
 	end
@@ -50,13 +49,13 @@ M.LvimMoveDownV = function()
 		local mode = vim.api.nvim_get_mode()["mode"]
 		if mode == "V" then
 			lines.down(mode)
-			if config.indent then
-				vim.cmd("normal! ==")
-				vim.cmd("normal! gv")
-			end
 		elseif mode == "v" then
 			characters.down()
 		elseif mode == "^V" then
+		end
+		if config.indent then
+			vim.cmd("normal! ==")
+			vim.cmd("normal! gv")
 		end
 	end
 end
@@ -68,13 +67,13 @@ M.LvimMoveUpV = function()
 		local mode = vim.api.nvim_get_mode()["mode"]
 		if mode == "V" then
 			lines.up(mode)
-			if config.indent then
-				vim.cmd("normal! ==")
-				vim.cmd("normal! gv")
-			end
 		elseif mode == "v" then
 			characters.up()
 		elseif mode == "^V" then
+		end
+		if config.indent then
+			vim.cmd("normal! ==")
+			vim.cmd("normal! gv")
 		end
 	end
 end

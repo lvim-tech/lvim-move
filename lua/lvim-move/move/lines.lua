@@ -133,7 +133,7 @@ M.left = function(mode)
 			if cursor_position < 1 then
 				cursor_position = 1
 			end
-			vim.api.nvim_win_set_cursor(0, { current_line, cursor_position })
+			vim.api.nvim_win_set_cursor(0, { current_line, cursor_position - 1 })
 		end
 	elseif mode == "V" then
 		local start_line = vim.fn.getcharpos("'<")[2]
@@ -158,7 +158,7 @@ M.left = function(mode)
 			if cursor_position < 1 then
 				cursor_position = 1
 			end
-			vim.api.nvim_win_set_cursor(0, { current_line, cursor_position })
+			vim.api.nvim_win_set_cursor(0, { current_line, cursor_position - 1 })
 		end
 	end
 end
@@ -173,7 +173,7 @@ M.right = function(mode)
 		else
 			vim.cmd("silent! normal! V" .. current_line)
 			vim.cmd("silent! normal! gv>")
-			vim.api.nvim_win_set_cursor(0, { current_line, config.cursor_position.column + tabstop })
+			vim.api.nvim_win_set_cursor(0, { current_line, (config.cursor_position.column - 1) + tabstop })
 		end
 	elseif mode == "V" then
 		local start_line = vim.fn.getcharpos("'<")[2]
@@ -186,6 +186,7 @@ M.right = function(mode)
 		else
 			vim.cmd("silent! normal! gv>")
 			if lines_number > 1 then
+				vim.notify("zzzzz")
 				if current_line == start_line then
 					vim.cmd("silent! normal! " .. (lines_number - 1) .. "jV" .. (lines_number - 1) .. "k")
 				elseif current_line == end_line then
@@ -194,7 +195,7 @@ M.right = function(mode)
 			else
 				vim.cmd("silent! normal! V" .. (lines_number - 1))
 			end
-			vim.api.nvim_win_set_cursor(0, { current_line, config.cursor_position.column + tabstop })
+			vim.api.nvim_win_set_cursor(0, { current_line, (config.cursor_position.column - 1) + tabstop })
 		end
 	end
 end
