@@ -4,54 +4,36 @@ local utils = require("lvim-move.utils")
 local M = {}
 
 local function set_maps()
-	vim.keymap.set(
-		"n",
-		config.maps.normal_down,
-		":<C-u> lua require('lvim-move.actions').LvimMoveDownN()<CR>",
-		{ noremap = true, silent = true }
-	)
-	vim.keymap.set(
-		"n",
-		config.maps.normal_up,
-		":<C-u> lua require('lvim-move.actions').LvimMoveUpN()<CR>",
-		{ noremap = true, silent = true, desc = "LvimMoveUpN" }
-	)
-	vim.keymap.set(
-		"n",
-		config.maps.normal_left,
-		":<C-u> lua require('lvim-move.actions').LvimMoveLeftN()<CR>",
-		{ noremap = true, silent = true, desc = "LvimMoveLeftN" }
-	)
-	vim.keymap.set(
-		"n",
-		config.maps.normal_right,
-		":<C-u> lua require('lvim-move.actions').LvimMoveRightN()<CR>",
-		{ noremap = true, silent = true, desc = "LvimMoveRightN" }
-	)
-	vim.keymap.set(
-		"x",
-		config.maps.visual_down,
-		":<C-u> lua require('lvim-move.actions').LvimMoveDownV()<CR>",
-		{ noremap = true, silent = true, desc = "LvimMoveDownV" }
-	)
-	vim.keymap.set(
-		"x",
-		config.maps.visual_up,
-		":<C-u> lua require('lvim-move.actions').LvimMoveUpV()<CR>",
-		{ noremap = true, silent = true, desc = "LvimMoveUpV" }
-	)
-	vim.keymap.set(
-		"x",
-		config.maps.visual_left,
-		":<C-u> lua require('lvim-move.actions').LvimMoveLeftV()<CR>",
-		{ noremap = true, silent = true, desc = "LvimMoveLeftV" }
-	)
-	vim.keymap.set(
-		"x",
-		config.maps.visual_right,
-		":<C-u> lua require('lvim-move.actions').LvimMoveRightV()<CR>",
-		{ noremap = true, silent = true, desc = "LvimMoveRightV" }
-	)
+	-- Normal mode: function callbacks are fine (no visual marks involved)
+	local normal_maps = {
+		{ config.maps.normal_down, "LvimMoveDownN", "Move line down" },
+		{ config.maps.normal_up, "LvimMoveUpN", "Move line up" },
+		{ config.maps.normal_left, "LvimMoveLeftN", "Move line left (dedent)" },
+		{ config.maps.normal_right, "LvimMoveRightN", "Move line right (indent)" },
+	}
+	for _, map in ipairs(normal_maps) do
+		local lhs, fn_name, desc = map[1], map[2], map[3]
+		vim.keymap.set("n", lhs, function()
+			require("lvim-move.actions")[fn_name]()
+		end, { noremap = true, silent = true, desc = desc })
+	end
+
+	-- Visual mode: use :<C-u> to ensure visual marks '< and '> are set before execution
+	local visual_maps = {
+		{ config.maps.visual_down, "LvimMoveDownV", "Move selection down" },
+		{ config.maps.visual_up, "LvimMoveUpV", "Move selection up" },
+		{ config.maps.visual_left, "LvimMoveLeftV", "Move selection left (dedent)" },
+		{ config.maps.visual_right, "LvimMoveRightV", "Move selection right (indent)" },
+	}
+	for _, map in ipairs(visual_maps) do
+		local lhs, fn_name, desc = map[1], map[2], map[3]
+		vim.keymap.set(
+			"x",
+			lhs,
+			":<C-u> lua require('lvim-move.actions')." .. fn_name .. "()<CR>",
+			{ noremap = true, silent = true, desc = desc }
+		)
+	end
 end
 
 M.setup = function(user_config)

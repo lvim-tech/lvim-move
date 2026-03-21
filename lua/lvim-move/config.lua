@@ -1,5 +1,7 @@
 local M = {
 	indent = true,
+	enable_move_hl = true,
+	move_hl = "LvimMoveHL",
 	maps = {
 		normal_down = "<A-j>",
 		normal_up = "<A-k>",
