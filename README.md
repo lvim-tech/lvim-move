@@ -2,6 +2,8 @@
 
 Move lines and character selections in any direction in Neovim.
 
+[![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD--3--Clause-blue.svg)](https://github.com/lvim-tech/lvim-move/blob/main/LICENSE)
+
 ## Features
 
 - Move lines **up/down** in normal and linewise visual mode
