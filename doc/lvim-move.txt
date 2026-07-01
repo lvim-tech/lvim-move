@@ -1,0 +1,135 @@
+*lvim-move.txt*        Move lines and character selections in any direction
+
+==============================================================================
+CONTENTS                                                        *lvim-move*
+
+  1. Introduction ........................... |lvim-move-intro|
+  2. Setup .................................. |lvim-move-setup|
+  3. Configuration .......................... |lvim-move-config|
+  4. Keymaps ................................ |lvim-move-keymaps|
+  5. Actions ................................ |lvim-move-actions|
+  6. Highlight .............................. |lvim-move-highlight|
+  7. Health ................................. |lvim-move-health|
+
+==============================================================================
+1. INTRODUCTION                                           *lvim-move-intro*
+
+lvim-move moves the current line, a linewise-visual block, or a charwise-visual
+selection up / down / left / right.
+
+  - Normal + linewise-visual (|V|): move lines up/down, indent/dedent left/right.
+  - Charwise-visual (|v|): move the selected characters within/across a line.
+  - Fold-aware: on a closed fold a vertical move OPENS the fold instead of
+    moving (so a fold is never swapped by accident).
+  - Auto-indent after a vertical line move (configurable, |lvim-move-config|).
+  - The cursor column is preserved across vertical moves.
+  - The moved selection is highlighted while the move is active
+    (|lvim-move-highlight|).
+
+lvim-move depends on lvim-utils for the shared option-merge and the palette that
+self-themes its highlight; it degrades gracefully when lvim-utils is absent.
+
+==============================================================================
+2. SETUP                                                  *lvim-move-setup*
+
+Call setup() once. All fields are optional; omit the argument for defaults. >lua
+    require("lvim-move").setup()
+<
+With overrides: >lua
+    require("lvim-move").setup({
+        indent = true,
+        enable_move_hl = true,
+        move_hl = "LvimMoveHL",
+        maps = {
+            normal_down = "<A-j>",
+            normal_up = "<A-k>",
+            normal_left = "<A-h>",
+            normal_right = "<A-l>",
+            visual_down = "<A-j>",
+            visual_up = "<A-k>",
+            visual_left = "<A-h>",
+            visual_right = "<A-l>",
+        },
+    })
+<
+==============================================================================
+3. CONFIGURATION                                          *lvim-move-config*
+
+The live config is `require("lvim-move.config")`; setup() merges your options
+into it in place. Runtime state lives in `lvim-move.state`, never in the config.
+
+                                                         *lvim-move-opt-indent*
+indent            boolean (default true)
+                  Auto-indent (`==`) the line/block after a vertical move.
+
+                                                 *lvim-move-opt-enable_move_hl*
+enable_move_hl    boolean (default true)
+                  Highlight the selection while a visual move is active.
+
+                                                        *lvim-move-opt-move_hl*
+move_hl           string (default "LvimMoveHL")
+                  The highlight group `Visual` is remapped to (via 'winhighlight')
+                  while moving. See |lvim-move-highlight|.
+
+                                                          *lvim-move-opt-maps*
+maps              table
+                  Left-hand sides for the eight actions. Set any to "" to
+                  DISABLE that mapping. Fields: normal_down / normal_up /
+                  normal_left / normal_right / visual_down / visual_up /
+                  visual_left / visual_right.
+
+==============================================================================
+4. KEYMAPS                                                *lvim-move-keymaps*
+
+Default (both normal and visual): >
+    <A-j>   move down
+    <A-k>   move up
+    <A-h>   move left  (dedent / chars left)
+    <A-l>   move right (indent / chars right)
+<
+Visual behaviour depends on the selection kind:
+  - Linewise (|V|) — moves / indents whole lines.
+  - Charwise (|v|) — moves the selected characters (up/down/left/right).
+
+Disable individual maps by passing "": >lua
+    require("lvim-move").setup({ maps = { normal_left = "", normal_right = "" } })
+<
+==============================================================================
+5. ACTIONS                                                *lvim-move-actions*
+
+Every action is exposed on `require("lvim-move.actions")`, so you can map your
+own keys: >lua
+    vim.keymap.set("n", "<C-j>", function()
+        require("lvim-move.actions").LvimMoveDownN()
+    end)
+<
+Available: `LvimMoveDownN`, `LvimMoveUpN`, `LvimMoveLeftN`, `LvimMoveRightN`,
+`LvimMoveDownV`, `LvimMoveUpV`, `LvimMoveLeftV`, `LvimMoveRightV` (the `V`
+variants must be mapped in visual/|x| mode).
+
+==============================================================================
+6. HIGHLIGHT                                             *lvim-move-highlight*
+
+                                                              *hl-LvimMoveHL*
+LvimMoveHL        The selection colour WHILE a visual move is active. lvim-move
+                  remaps `Visual` to this group with 'winhighlight' for the
+                  duration of the move, then restores it on leaving visual mode.
+
+When lvim-utils is installed the default `LvimMoveHL` is self-themed from the
+palette (a blue tinted toward the background) and tracks colorscheme changes
+automatically — while still being overridable (it is defined with `default`).
+
+Override it yourself: >lua
+    vim.api.nvim_set_hl(0, "LvimMoveHL", { bg = "#3d5473" })
+<
+Or point `move_hl` at your own group, or disable it: >lua
+    require("lvim-move").setup({ enable_move_hl = false })
+<
+==============================================================================
+7. HEALTH                                                 *lvim-move-health*
+
+Run |:checkhealth| lvim-move to verify the Neovim version, whether lvim-utils
+is available, that the move highlight resolves, and how many keymaps are bound.
+
+==============================================================================
+vim:tw=78:ts=8:et:ft=help:norl:
