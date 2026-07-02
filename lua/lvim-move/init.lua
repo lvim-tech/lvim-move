@@ -20,6 +20,7 @@ local M = {}
 --- Bind the eight configured keymaps. Normal-mode moves use a Lua callback; visual-mode moves use a
 --- `:<C-u> … <CR>` command string so the '< / '> marks are set BEFORE the action runs (they are only committed
 --- on leaving visual mode). A map whose lhs is "" is skipped (the documented way to disable one).
+---@return nil
 local function set_maps()
     ---@type { [1]: string, [2]: string, [3]: string }[]
     local normal_maps = {
@@ -60,6 +61,7 @@ end
 --- Merge the user's options, self-theme the move highlight, and install the keymaps. Safe to call again to
 --- re-apply after a config change.
 ---@param user_config? LvimMoveConfig  partial overrides; anything omitted keeps its default
+---@return nil
 M.setup = function(user_config)
     if ok_utils and uu.merge then
         uu.merge(config, user_config or {})

@@ -92,6 +92,7 @@ end
 
 --- Dedent the current line / selected block (move LEFT).
 ---@param mode "n"|"V"
+---@return nil
 M.left = function(mode)
     if mode == "n" then
         local current_line = api.nvim_win_get_cursor(0)[1]
@@ -99,7 +100,7 @@ M.left = function(mode)
             vim.cmd("silent! normal! zv")
         else
             vim.cmd("normal! <<")
-            local col = math.max(1, state.column - vim.o.tabstop)
+            local col = math.max(1, state.column - fn.shiftwidth())
             api.nvim_win_set_cursor(0, { current_line, col - 1 })
         end
     elseif mode == "V" then
@@ -117,6 +118,7 @@ end
 
 --- Indent the current line / selected block (move RIGHT).
 ---@param mode "n"|"V"
+---@return nil
 M.right = function(mode)
     if mode == "n" then
         local current_line = api.nvim_win_get_cursor(0)[1]
@@ -124,7 +126,7 @@ M.right = function(mode)
             vim.cmd("silent! normal! zv")
         else
             vim.cmd("normal! >>")
-            api.nvim_win_set_cursor(0, { current_line, (state.column - 1) + vim.o.tabstop })
+            api.nvim_win_set_cursor(0, { current_line, (state.column - 1) + fn.shiftwidth() })
         end
     elseif mode == "V" then
         local start_line = fn.getpos("'<")[2]

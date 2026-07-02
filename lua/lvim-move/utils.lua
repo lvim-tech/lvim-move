@@ -22,6 +22,7 @@ local HL_AUG = api.nvim_create_augroup("LvimMoveHL", { clear = true })
 --- `default = true`, so a colorscheme or the user can still override it. When lvim-utils is absent the plugin
 --- falls back to a plain distinct link so the moved selection still shows a colour. A custom `move_hl` group is
 --- the user's to define. Call once from setup().
+---@return nil
 function M.apply_hl()
     local ok, hl = pcall(require, "lvim-utils.highlight")
     if ok and type(hl.bind) == "function" then
@@ -36,6 +37,7 @@ end
 
 --- Capture the current cursor column into state, so a vertical move can restore it on the moved line
 --- afterwards. Uses getcurpos()[5] (the "want" column, which survives moving onto a shorter/longer line).
+---@return nil
 function M.cursor_position()
     state.column = vim.fn.getcurpos()[5]
 end
@@ -43,6 +45,7 @@ end
 --- Remap Visual → `config.move_hl` for the current window so the block/chars being moved get a distinct
 --- colour, and restore the previous winhl once visual mode ends. No-op when `enable_move_hl` is off or the
 --- selection was already dropped by the time the deferred callback runs.
+---@return nil
 function M.apply_move_hl()
     if not config.enable_move_hl then
         return

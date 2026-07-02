@@ -14,8 +14,9 @@ local characters = require("lvim-move.move.characters")
 local M = {}
 
 --- Run a NORMAL-mode line move: capture the column, move, then optionally re-indent the moved line.
----@param fn fun(mode: "n"): boolean|nil  a move.lines primitive; returns true when it actually moved a line
----@param with_indent boolean             re-indent (`==`) after a successful vertical move
+---@param fn fun(mode: "n"|"V"): boolean|nil  a move.lines primitive; returns true when it actually moved a line
+---@param with_indent boolean                 re-indent (`==`) after a successful vertical move
+---@return nil
 local function normal_move(fn, with_indent)
     if not vim.bo.modifiable then
         return
@@ -29,9 +30,10 @@ end
 
 --- Run a VISUAL-mode move: re-assert the selection, dispatch by kind (linewise `V` → line_fn, charwise `v` →
 --- char_fn), optionally re-indent + re-select, then apply the moving highlight.
----@param line_fn fun(mode: string): boolean|nil  the linewise (move.lines) primitive
----@param char_fn fun()                            the charwise (move.characters) primitive
----@param with_indent boolean                      re-indent (`==`) after a successful linewise move
+---@param line_fn fun(mode: "n"|"V"): boolean|nil  the linewise (move.lines) primitive
+---@param char_fn fun()                             the charwise (move.characters) primitive
+---@param with_indent boolean                       re-indent (`==`) after a successful linewise move
+---@return nil
 local function visual_move(line_fn, char_fn, with_indent)
     if not vim.bo.modifiable then
         return
@@ -52,35 +54,43 @@ local function visual_move(line_fn, char_fn, with_indent)
 end
 
 --- Move the current line down (normal mode).
+---@return nil
 M.LvimMoveDownN = function()
     normal_move(lines.down, config.indent)
 end
 --- Move the current line up (normal mode).
+---@return nil
 M.LvimMoveUpN = function()
     normal_move(lines.up, config.indent)
 end
 --- Dedent the current line (normal mode).
+---@return nil
 M.LvimMoveLeftN = function()
     normal_move(lines.left, false)
 end
 --- Indent the current line (normal mode).
+---@return nil
 M.LvimMoveRightN = function()
     normal_move(lines.right, false)
 end
 
 --- Move the selection down (visual mode: linewise block / charwise chars).
+---@return nil
 M.LvimMoveDownV = function()
     visual_move(lines.down, characters.down, config.indent)
 end
 --- Move the selection up (visual mode: linewise block / charwise chars).
+---@return nil
 M.LvimMoveUpV = function()
     visual_move(lines.up, characters.up, config.indent)
 end
 --- Dedent the selection / move the selected chars left (visual mode).
+---@return nil
 M.LvimMoveLeftV = function()
     visual_move(lines.left, characters.left, false)
 end
 --- Indent the selection / move the selected chars right (visual mode).
+---@return nil
 M.LvimMoveRightV = function()
     visual_move(lines.right, characters.right, false)
 end

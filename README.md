@@ -16,41 +16,50 @@ Move lines and character selections in any direction in Neovim.
 
 ## Installation
 
-### 1. [lazy.nvim](https://github.com/folke/lazy.nvim)
+Requires Neovim >= 0.10 and [lvim-utils](https://github.com/lvim-tech/lvim-utils).
+
+### lvim-installer (recommended)
+
+Install and manage it from the LVIM package manager — open the **Plugins** tab and install / update / pin it:
+
+```vim
+:LvimInstaller plugins
+```
+
+lvim-installer installs plugins through Neovim's built-in `vim.pack`, so no external plugin manager is needed.
+
+### lazy.nvim
 
 ```lua
 return {
     "lvim-tech/lvim-move",
     dependencies = { "lvim-tech/lvim-utils" },
     config = function()
-        require("lvim-move").setup()
+        require("lvim-move").setup({})
     end,
 }
 ```
 
-### 2. Native (vim.pack / packadd)
+### packer.nvim
+
+```lua
+use({
+    "lvim-tech/lvim-move",
+    requires = { "lvim-tech/lvim-utils" },
+    config = function()
+        require("lvim-move").setup({})
+    end,
+})
+```
+
+### Native (vim.pack)
 
 ```lua
 vim.pack.add({
     { src = "https://github.com/lvim-tech/lvim-utils" },
     { src = "https://github.com/lvim-tech/lvim-move" },
 })
-
-require("lvim-move").setup()
-```
-
-### 3. [Packer](https://github.com/wbthomason/packer.nvim)
-
-```lua
-use({
-    "lvim-tech/lvim-move",
-    requires = {
-        { "lvim-tech/lvim-utils" },
-    },
-    config = function()
-        require("lvim-move").setup()
-    end,
-})
+require("lvim-move").setup({})
 ```
 
 ## Setup
@@ -91,7 +100,7 @@ require("lvim-move").setup({
 Visual mode behaves differently depending on selection type:
 
 - **Linewise (`V`)** — moves/indents whole lines
-- **Charwise (`v`)** — moves the selected characters within the line (up/down/left/right)
+- **Charwise (`v`)** — up/down move the selected characters to the adjacent line; left/right swap them with the neighbouring character within the line
 
 ## Highlight
 
