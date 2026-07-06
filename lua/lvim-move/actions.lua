@@ -24,6 +24,7 @@ local function normal_move(fn, with_indent)
     utils.cursor_position()
     local moved = fn("n")
     if with_indent and moved then
+        pcall(vim.cmd, "undojoin")
         vim.cmd("normal! ==")
     end
 end
@@ -47,6 +48,7 @@ local function visual_move(line_fn, char_fn, with_indent)
         char_fn()
     end
     if with_indent and moved then
+        pcall(vim.cmd, "undojoin")
         vim.cmd("normal! ==")
         vim.cmd("normal! gv")
     end

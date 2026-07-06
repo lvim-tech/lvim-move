@@ -16,6 +16,7 @@ local M = {}
 --- The augroup owning the one-shot ModeChanged autocmd that restores winhl when visual mode ends.
 ---@type integer
 local HL_AUG = api.nvim_create_augroup("LvimMoveHL", { clear = true })
+local prev_winhl_by_win = {}
 
 --- Self-theme the DEFAULT move highlight group ("LvimMoveHL") from the lvim-utils palette — a blue tinted
 --- toward the background, re-applied automatically on every theme change (via highlight.bind). Applied with
@@ -61,11 +62,17 @@ function M.apply_move_hl()
             return
         end
 
-        local prev_winhl = vim.wo.winhl
+        local current_winhl = vim.wo.winhl
+        local prev_winhl = current_winhl
+        if current_winhl:find(hl_entry, 1, true) then
+            prev_winhl = prev_winhl_by_win[win] or current_winhl:gsub("(^" .. vim.pesc(hl_entry) .. ",?)", "")
+        else
+            prev_winhl_by_win[win] = current_winhl
+        end
 
         -- prepend our entry (the first match in winhl wins) — but only once
-        if not prev_winhl:find(hl_entry, 1, true) then
-            vim.wo.winhl = hl_entry .. (prev_winhl ~= "" and "," .. prev_winhl or "")
+        if not current_winhl:find(hl_entry, 1, true) then
+            vim.wo.winhl = hl_entry .. (current_winhl ~= "" and "," .. current_winhl or "")
         end
 
         -- restore winhl the moment we leave visual mode (any of v / V / <C-v>)
@@ -79,6 +86,7 @@ function M.apply_move_hl()
                     if api.nvim_win_is_valid(win) then
                         vim.wo[win].winhl = prev_winhl
                     end
+                    prev_winhl_by_win[win] = nil
                     return true -- delete the autocmd
                 end
             end,
