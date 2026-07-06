@@ -7,25 +7,39 @@
 ---@module "lvim-move.actions"
 
 local config = require("lvim-move.config")
+local state = require("lvim-move.state")
 local utils = require("lvim-move.utils")
 local lines = require("lvim-move.move.lines")
 local characters = require("lvim-move.move.characters")
 
+local api = vim.api
+local fn = vim.fn
+
 local M = {}
 
 --- Run a NORMAL-mode line move: capture the column, move, then optionally re-indent the moved line.
----@param fn fun(mode: "n"|"V"): boolean|nil  a move.lines primitive; returns true when it actually moved a line
----@param with_indent boolean                 re-indent (`==`) after a successful vertical move
+---@param move_fn fun(mode: "n"|"V"): boolean|nil  a move.lines primitive; returns true when it actually moved a line
+---@param with_indent boolean                      re-indent (`==`) after a successful vertical move
 ---@return nil
-local function normal_move(fn, with_indent)
+local function normal_move(move_fn, with_indent)
     if not vim.bo.modifiable then
         return
     end
     utils.cursor_position()
-    local moved = fn("n")
+    local moved = move_fn("n")
     if with_indent and moved then
+        -- The primitive left the cursor on the moved line at the preserved column; a bare `==` would jump it
+        -- to first-non-blank, discarding that column (the plugin's advertised "cursor-column preserving"). So
+        -- re-apply the column AFTER the reindent, shifted by the indent delta so it stays over the SAME
+        -- character. undojoin folds the `==` into the move's own undo block (one `u` reverts both).
+        local row = api.nvim_win_get_cursor(0)[1]
+        local indent_before = fn.indent(row)
         pcall(vim.cmd, "undojoin")
         vim.cmd("normal! ==")
+        local indent_after = fn.indent(row)
+        local line = api.nvim_buf_get_lines(0, row - 1, row, false)[1] or ""
+        local col = math.max(0, (state.column - 1) + (indent_after - indent_before))
+        api.nvim_win_set_cursor(0, { row, math.min(col, #line) })
     end
 end
 
