@@ -32,6 +32,14 @@ M.down = function(mode)
         if fn.foldclosed(current_line) > -1 then
             vim.cmd("silent! normal! zv")
         elseif current_line < last_line then
+            -- If the line below is inside a CLOSED fold, hop the line over the WHOLE fold in one step
+            -- (fold/mark-aware `:move`) instead of swapping into the middle of it and splitting the fold.
+            local fold_end = fn.foldclosedend(current_line + 1)
+            if fold_end > -1 then
+                vim.cmd(current_line .. "move " .. fold_end)
+                api.nvim_win_set_cursor(0, { fold_end, state.column - 1 })
+                return true
+            end
             local two = api.nvim_buf_get_lines(0, current_line - 1, current_line + 1, false)
             api.nvim_buf_set_lines(0, current_line - 1, current_line + 1, false, { two[2], two[1] })
             api.nvim_win_set_cursor(0, { current_line + 1, state.column - 1 })
@@ -45,6 +53,14 @@ M.down = function(mode)
         if fn.foldclosed(current_line) > -1 then
             vim.cmd("silent! normal! zv")
         elseif end_line < last_line then
+            -- Below the selection is a closed fold → hop the whole block over the fold (fold-aware `:move`).
+            local fold_end = fn.foldclosedend(end_line + 1)
+            if fold_end > -1 then
+                vim.cmd(start_line .. "," .. end_line .. "move " .. fold_end)
+                local shift = fold_end - end_line
+                reselect_block(start_line + shift, end_line + shift)
+                return true
+            end
             local vSRow = start_line - 1
             local vERow = end_line
             local lines_buf = api.nvim_buf_get_lines(0, vSRow, vERow + 1, false)
@@ -66,6 +82,13 @@ M.up = function(mode)
         if fn.foldclosed(current_line) > -1 then
             vim.cmd("silent! normal! zv")
         elseif current_line > 1 then
+            -- If the line above is inside a CLOSED fold, hop the line over the WHOLE fold in one step.
+            local fold_start = fn.foldclosed(current_line - 1)
+            if fold_start > -1 then
+                vim.cmd(current_line .. "move " .. (fold_start - 1))
+                api.nvim_win_set_cursor(0, { fold_start, state.column - 1 })
+                return true
+            end
             local two = api.nvim_buf_get_lines(0, current_line - 2, current_line, false)
             api.nvim_buf_set_lines(0, current_line - 2, current_line, false, { two[2], two[1] })
             api.nvim_win_set_cursor(0, { current_line - 1, state.column - 1 })
@@ -78,6 +101,13 @@ M.up = function(mode)
         if fn.foldclosed(current_line) > -1 then
             vim.cmd("silent! normal! zv")
         elseif start_line > 1 then
+            -- Above the selection is a closed fold → hop the whole block over the fold (fold-aware `:move`).
+            local fold_start = fn.foldclosed(start_line - 1)
+            if fold_start > -1 then
+                vim.cmd(start_line .. "," .. end_line .. "move " .. (fold_start - 1))
+                reselect_block(fold_start, fold_start + (end_line - start_line))
+                return true
+            end
             local vSRow = start_line - 1
             local vERow = end_line
             local lines_buf = api.nvim_buf_get_lines(0, vSRow - 1, vERow, false)

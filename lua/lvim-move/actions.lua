@@ -25,21 +25,25 @@ local function normal_move(move_fn, with_indent)
     if not vim.bo.modifiable then
         return
     end
-    utils.cursor_position()
-    local moved = move_fn("n")
-    if with_indent and moved then
-        -- The primitive left the cursor on the moved line at the preserved column; a bare `==` would jump it
-        -- to first-non-blank, discarding that column (the plugin's advertised "cursor-column preserving"). So
-        -- re-apply the column AFTER the reindent, shifted by the indent delta so it stays over the SAME
-        -- character. undojoin folds the `==` into the move's own undo block (one `u` reverts both).
-        local row = api.nvim_win_get_cursor(0)[1]
-        local indent_before = fn.indent(row)
-        pcall(vim.cmd, "undojoin")
-        vim.cmd("normal! ==")
-        local indent_after = fn.indent(row)
-        local line = api.nvim_buf_get_lines(0, row - 1, row, false)[1] or ""
-        local col = math.max(0, (state.column - 1) + (indent_after - indent_before))
-        api.nvim_win_set_cursor(0, { row, math.min(col, #line) })
+    -- A count (`3<A-j>`) repeats the move that many lines / indent steps. `v:count1` is 1 with no count;
+    -- capture it before any `normal!` below resets it. Boundary iterations are harmless no-ops.
+    for _ = 1, vim.v.count1 do
+        utils.cursor_position()
+        local moved = move_fn("n")
+        if with_indent and moved then
+            -- The primitive left the cursor on the moved line at the preserved column; a bare `==` would jump
+            -- it to first-non-blank, discarding that column (the plugin's advertised "cursor-column
+            -- preserving"). So re-apply the column AFTER the reindent, shifted by the indent delta so it stays
+            -- over the SAME character. undojoin folds the `==` into the move's own undo block (one `u` reverts).
+            local row = api.nvim_win_get_cursor(0)[1]
+            local indent_before = fn.indent(row)
+            pcall(vim.cmd, "undojoin")
+            vim.cmd("normal! ==")
+            local indent_after = fn.indent(row)
+            local line = api.nvim_buf_get_lines(0, row - 1, row, false)[1] or ""
+            local col = math.max(0, (state.column - 1) + (indent_after - indent_before))
+            api.nvim_win_set_cursor(0, { row, math.min(col, #line) })
+        end
     end
 end
 
@@ -53,13 +57,22 @@ local function visual_move(line_fn, char_fn, with_indent)
     if not vim.bo.modifiable then
         return
     end
-    vim.cmd("silent! normal! gv")
-    local mode = vim.api.nvim_get_mode().mode
-    local moved
-    if mode == "V" then
-        moved = line_fn(mode)
-    elseif mode == "v" then
-        char_fn()
+    -- A count (`2<A-j>`) repeats the block move that many steps. Between iterations we leave visual mode with
+    -- `<Esc>` so the `'<`/`'>` marks COMMIT to the freshly re-selected block — otherwise the next `gv` would
+    -- restore the stale pre-move selection. The final iteration stays in visual (as the single-move path does).
+    local count = vim.v.count1
+    local mode, moved
+    for i = 1, count do
+        vim.cmd("silent! normal! gv")
+        mode = vim.api.nvim_get_mode().mode
+        if mode == "V" then
+            moved = line_fn(mode)
+        elseif mode == "v" then
+            char_fn()
+        end
+        if i < count then
+            vim.cmd("normal! \27")
+        end
     end
     if with_indent and moved then
         pcall(vim.cmd, "undojoin")
