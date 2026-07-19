@@ -37,10 +37,12 @@ function M.apply_hl()
 end
 
 --- Capture the current cursor column into state, so a vertical move can restore it on the moved line
---- afterwards. Uses getcurpos()[5] (the "want" column, which survives moving onto a shorter/longer line).
+--- afterwards. Uses getcursorcharpos()[3] — the 1-based CHARACTER column — so the restore (setcursorcharpos)
+--- lands on the same character on multibyte (e.g. Cyrillic) lines; a line move carries its content with it, so
+--- the character column is exact (unlike a byte column, which drifts on non-ASCII text).
 ---@return nil
 function M.cursor_position()
-    state.column = vim.fn.getcurpos()[5]
+    state.column = vim.fn.getcursorcharpos()[3]
 end
 
 --- Remap Visual → `config.move_hl` for the current window so the block/chars being moved get a distinct
@@ -65,7 +67,7 @@ function M.apply_move_hl()
         local current_winhl = vim.wo.winhl
         local prev_winhl = current_winhl
         if current_winhl:find(hl_entry, 1, true) then
-            prev_winhl = prev_winhl_by_win[win] or current_winhl:gsub("(^" .. vim.pesc(hl_entry) .. ",?)", "")
+            prev_winhl = prev_winhl_by_win[win] or (current_winhl:gsub("^" .. vim.pesc(hl_entry) .. ",?", ""))
         else
             prev_winhl_by_win[win] = current_winhl
         end

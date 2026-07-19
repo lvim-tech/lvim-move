@@ -27,22 +27,27 @@ local function normal_move(move_fn, with_indent)
     end
     -- A count (`3<A-j>`) repeats the move that many lines / indent steps. `v:count1` is 1 with no count;
     -- capture it before any `normal!` below resets it. Boundary iterations are harmless no-ops.
-    for _ = 1, vim.v.count1 do
+    for i = 1, vim.v.count1 do
         utils.cursor_position()
+        -- Fold every step of a counted move (`3<A-j>`) into ONE undo block, so a single `u` reverts the whole
+        -- gesture — matching native `:m .+3`. Each step's `nvim_buf_set_lines` would otherwise be its own block.
+        if i > 1 then
+            pcall(vim.cmd, "undojoin")
+        end
         local moved = move_fn("n")
         if with_indent and moved then
-            -- The primitive left the cursor on the moved line at the preserved column; a bare `==` would jump
-            -- it to first-non-blank, discarding that column (the plugin's advertised "cursor-column
-            -- preserving"). So re-apply the column AFTER the reindent, shifted by the indent delta so it stays
-            -- over the SAME character. undojoin folds the `==` into the move's own undo block (one `u` reverts).
+            -- The primitive left the cursor on the moved line at the preserved (character) column; a bare `==`
+            -- would jump it to first-non-blank, discarding that column (the plugin's advertised "cursor-column
+            -- preserving"). So re-apply the column AFTER the reindent, shifted by the indent delta (in display
+            -- cells; the leading indent is whitespace, 1 cell = 1 char) so it stays over the SAME character.
+            -- undojoin folds the `==` into the move's own undo block.
             local row = api.nvim_win_get_cursor(0)[1]
             local indent_before = fn.indent(row)
             pcall(vim.cmd, "undojoin")
             vim.cmd("normal! ==")
             local indent_after = fn.indent(row)
-            local line = api.nvim_buf_get_lines(0, row - 1, row, false)[1] or ""
-            local col = math.max(0, (state.column - 1) + (indent_after - indent_before))
-            api.nvim_win_set_cursor(0, { row, math.min(col, #line) })
+            local col = math.max(1, state.column + (indent_after - indent_before))
+            fn.setcursorcharpos(row, col)
         end
     end
 end
@@ -64,6 +69,10 @@ local function visual_move(line_fn, char_fn, with_indent)
     local mode, moved
     for i = 1, count do
         vim.cmd("silent! normal! gv")
+        -- One undo block for the whole counted block-move (see normal_move).
+        if i > 1 then
+            pcall(vim.cmd, "undojoin")
+        end
         mode = vim.api.nvim_get_mode().mode
         if mode == "V" then
             moved = line_fn(mode)

@@ -37,12 +37,12 @@ M.down = function(mode)
             local fold_end = fn.foldclosedend(current_line + 1)
             if fold_end > -1 then
                 vim.cmd(current_line .. "move " .. fold_end)
-                api.nvim_win_set_cursor(0, { fold_end, state.column - 1 })
+                fn.setcursorcharpos(fold_end, state.column)
                 return true
             end
             local two = api.nvim_buf_get_lines(0, current_line - 1, current_line + 1, false)
             api.nvim_buf_set_lines(0, current_line - 1, current_line + 1, false, { two[2], two[1] })
-            api.nvim_win_set_cursor(0, { current_line + 1, state.column - 1 })
+            fn.setcursorcharpos(current_line + 1, state.column)
             return true
         end
     elseif mode == "V" then
@@ -86,12 +86,12 @@ M.up = function(mode)
             local fold_start = fn.foldclosed(current_line - 1)
             if fold_start > -1 then
                 vim.cmd(current_line .. "move " .. (fold_start - 1))
-                api.nvim_win_set_cursor(0, { fold_start, state.column - 1 })
+                fn.setcursorcharpos(fold_start, state.column)
                 return true
             end
             local two = api.nvim_buf_get_lines(0, current_line - 2, current_line, false)
             api.nvim_buf_set_lines(0, current_line - 2, current_line, false, { two[2], two[1] })
-            api.nvim_win_set_cursor(0, { current_line - 1, state.column - 1 })
+            fn.setcursorcharpos(current_line - 1, state.column)
             return true
         end
     elseif mode == "V" then
@@ -131,7 +131,7 @@ M.left = function(mode)
         else
             vim.cmd("normal! <<")
             local col = math.max(1, state.column - fn.shiftwidth())
-            api.nvim_win_set_cursor(0, { current_line, col - 1 })
+            fn.setcursorcharpos(current_line, col)
         end
     elseif mode == "V" then
         local start_line = fn.getpos("'<")[2]
@@ -156,7 +156,7 @@ M.right = function(mode)
             vim.cmd("silent! normal! zv")
         else
             vim.cmd("normal! >>")
-            api.nvim_win_set_cursor(0, { current_line, (state.column - 1) + fn.shiftwidth() })
+            fn.setcursorcharpos(current_line, state.column + fn.shiftwidth())
         end
     elseif mode == "V" then
         local start_line = fn.getpos("'<")[2]

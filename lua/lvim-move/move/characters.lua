@@ -30,7 +30,18 @@ end
 local function reselect_char(line_nr, start_col, end_col)
     local line = api.nvim_buf_get_lines(0, line_nr - 1, line_nr, false)[1] or ""
     local start_byte = fn.byteidx(line, start_col - 1)
-    local end_byte = fn.byteidx(line, end_col - 1)
+    -- With `selection=inclusive` (the default) the cursor sits ON the last char's first byte and the char is
+    -- covered. With `selection=exclusive` the selection stops BEFORE the cursor, so land it one char further —
+    -- the byte just past the last selected char — or the whole span loses its final character.
+    local end_byte
+    if vim.o.selection == "exclusive" then
+        end_byte = fn.byteidx(line, end_col)
+        if end_byte < 0 then
+            end_byte = #line
+        end
+    else
+        end_byte = fn.byteidx(line, end_col - 1)
+    end
     vim.cmd("normal! \27")
     api.nvim_win_set_cursor(0, { line_nr, start_byte })
     vim.cmd("normal! v")
